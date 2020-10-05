@@ -11,20 +11,22 @@ namespace Platformer
 {
     public class Player : Entity
     {
-        private static readonly Vector2f PlayerSize = new Vector2f(32, 48);
-        private bool moveLeft, moveRight, jump;
+        private static Texture texture = new Texture("Robot.png");
+        private static Sprite sprite = new Sprite(texture);
+        private static readonly Vector2f PlayerSize = new Vector2f(36, 64);
+        private bool moveLeft, moveRight, jump, movingRight, movingLeft;
         private float verticalVelocity;
         public Player() : base(new RectangleShape(PlayerSize)
         {
-            FillColor = Color.Blue
+
         })
         { }
         private void OnKeyPressed(object sender, KeyEventArgs ev)
         {
             switch (ev.Code)
             {
-                case Keyboard.Key.Left: moveLeft = true; break;
-                case Keyboard.Key.Right: moveRight = true; break;
+                case Keyboard.Key.Left: moveLeft = true; movingRight = false; movingLeft = true; break;
+                case Keyboard.Key.Right: moveRight = true; movingRight = true; movingLeft = false; break;
                 case Keyboard.Key.Up: jump = true; break;
             }
         }
@@ -52,12 +54,15 @@ namespace Platformer
             Vector2f amount = new Vector2f(0, 0);
             if (moveLeft)
             {
+                movingLeft = true;
                 amount.X -= 200.0f;
             }
             if (moveRight)
             {
+                
                 amount.X += 200.0f;
             }
+            
             if (scene.IsGrounded(this))
             {
                 verticalVelocity = 0.0f;
@@ -77,6 +82,20 @@ namespace Platformer
             {
                 scene.ShouldRestart = true;
             }
+            if (movingRight)
+            {
+                sprite.Scale = new Vector2f(-1f, 1f);
+            }
+            if (movingLeft)
+            {
+                sprite.Scale = new Vector2f(1f, 1f);
+            }
+            sprite.Origin = new Vector2f(PlayerSize.X / 2, PlayerSize.Y / 2);
+            sprite.Position = Position;
+        }
+        public override void Render(RenderTarget target)
+        {
+            target.Draw(sprite);
         }
     }
 }
