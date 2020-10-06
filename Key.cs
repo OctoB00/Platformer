@@ -1,4 +1,3 @@
-﻿using SFML.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +10,10 @@ namespace Platformer
 {
     public class Key : Entity
     {
-        public Key() : base(new CircleShape(16)
+        private static Texture texture = new Texture("Key.png");
+        private static Sprite sprite = new Sprite(texture);
+        private static int circleRadius = 32;
+        public Key() : base(new CircleShape(circleRadius)
         {
             FillColor = Color.Green
         })
@@ -27,6 +29,12 @@ namespace Platformer
                     break;
                 }
             }
+            sprite.Origin = new Vector2f(circleRadius / 2, circleRadius / 2);
+            sprite.Position = Position;
+        }
+        public override void Render(RenderTarget target)
+        {
+            target.Draw(sprite);
         }
     }
 }
