@@ -1,7 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
 using System.Text;
 using SFML.Graphics;
 using SFML.System;
@@ -11,11 +9,12 @@ namespace Platformer
 {
     public class Player : Entity
     {
-        private static Texture texture = new Texture("Robot.png");
+        private static readonly Texture texture = new Texture("Robot.png");
         private static Sprite sprite = new Sprite(texture);
         private static readonly Vector2f PlayerSize = new Vector2f(36, 64);
         private bool moveLeft, moveRight, jump, movingRight, movingLeft;
         private float verticalVelocity;
+        Animator animator = new Animator(36, 64, 8);
         public Player() : base(new RectangleShape(PlayerSize)
         {
 
@@ -25,8 +24,8 @@ namespace Platformer
         {
             switch (ev.Code)
             {
-                case Keyboard.Key.Left: moveLeft = true; movingRight = false; movingLeft = true; break;
-                case Keyboard.Key.Right: moveRight = true; movingRight = true; movingLeft = false; break;
+                case Keyboard.Key.Left: moveLeft = true;  movingRight = false; movingLeft = true; break;
+                case Keyboard.Key.Right: moveRight = true; movingLeft = false; movingRight = true; break;
                 case Keyboard.Key.Up: jump = true; break;
             }
         }
@@ -54,12 +53,10 @@ namespace Platformer
             Vector2f amount = new Vector2f(0, 0);
             if (moveLeft)
             {
-                movingLeft = true;
                 amount.X -= 200.0f;
             }
             if (moveRight)
             {
-                
                 amount.X += 200.0f;
             }
             
@@ -82,20 +79,31 @@ namespace Platformer
             {
                 scene.ShouldRestart = true;
             }
-            if (movingRight)
+            if (movingLeft)
             {
                 sprite.Scale = new Vector2f(-1f, 1f);
             }
-            if (movingLeft)
+            else
             {
                 sprite.Scale = new Vector2f(1f, 1f);
             }
             sprite.Origin = new Vector2f(PlayerSize.X / 2, PlayerSize.Y / 2);
             sprite.Position = Position;
         }
+        
         public override void Render(RenderTarget target)
         {
-            target.Draw(sprite);
+            if (moveRight || moveLeft)
+            {
+                sprite = animator.GetSprite();
+                animator.Animate(sprite);
+                target.Draw(sprite);
+            }
+            else
+            {
+                target.Draw(sprite);
+            }
+            
         }
     }
 }
